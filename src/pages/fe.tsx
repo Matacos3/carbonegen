@@ -2,18 +2,19 @@
 import { useEffect, useState } from "react"
 import useSWR from "swr"
 import Fe from "../components/Fe"
+import { feResponses } from "./api/fetch_data"
 
 export default function fe() {
 
   //declaring state of pagination
 
   const [pageStart, setPageStart] = useState(1)
-  const [incrementedData, setIncrementedData] = useState([])
+  const [incrementedData, setIncrementedData] = useState<feResponses>([])
   const [counter, setCounter] = useState(0)
   //declaring fetch function
   const fetcher = (...args) => fetch(...args).then(res => res.json())
   //fetching data
-  const { data, error, isLoading } = useSWR(`/api/fetch_data?position=${pageStart}`, fetcher)
+  const { data, error, isLoading } = useSWR<feResponses>(`/api/fetch_data?position=${pageStart}`, fetcher)
 
   //function to display more datas
   const displayFes = () => {
@@ -26,7 +27,7 @@ export default function fe() {
     if (data) {
       console.log("Use effect");
       
-      setIncrementedData([...incrementedData, ...data.results]);
+      setIncrementedData([...incrementedData, ...data]);
     }
   }, [data]);
 
@@ -47,7 +48,7 @@ export default function fe() {
       <div className="flex flex-wrap mx-10">
         {isLoading && <div>Loading...</div>}
         {incrementedData?.map(dataItem =>
-          <Fe name={dataItem.Nom_base_anglais ? dataItem.Nom_base_anglais : dataItem.Nom_base_français} emitted={dataItem.Total_poste_non_décomposé} unit={dataItem.Unité_anglais} source={dataItem.Source ? dataItem.Source : "Source inconnue"} id={dataItem['Identifiant_de_l\'élément']} />
+          <Fe name={dataItem.Nom_base_anglais ? dataItem.Nom_base_anglais : dataItem.Nom_base_français} emitted={dataItem.Total_poste_non_décomposé} unit={dataItem.Unité_anglais} source={dataItem.Source ? dataItem.Source : "Source inconnue"} id={Number(dataItem['Identifiant_de_l\'élément'])} />
         )}
       </div>
       <div className="w-fit mx-auto my-2">

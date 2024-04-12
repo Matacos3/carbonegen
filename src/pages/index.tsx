@@ -2,7 +2,22 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import * as z from "zod";
 import {useForm} from "react-hook-form";
+import zod from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"; // Ajoutez cette ligne
 
+
+
+//declaring zod schema
+const loginSchema = z.object({
+  email: z.string().email("Veuillez saisir une adresse e-mail valide"),
+  password: z
+    .string()
+    .min(8, "Le mot de passe doit contenir au moins 8 caractères")
+    .max(128, "Le mot de passe ne doit pas dépasser 128 caractères"),
+});
+  //stating schema as type
+
+  export type loginSchemaType = z.infer<typeof loginSchema>
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,7 +36,10 @@ const {
   handleSubmit,
   watch,
   formState: { errors },
-} = useForm()
+} = useForm<loginSchemaType>({
+  mode : "onBlur",
+  resolver : zodResolver(loginSchema)
+})
 
 console.log(watch("email"))
 console.log(watch("password"))
@@ -31,14 +49,6 @@ const onSubmit = (data, event) =>{
   event.preventDefault()
   console.log(data)
 }
-  //declaring zod schema
-  const loginSchema = z.object({
-    email: z.string().email("Veuillez saisir une adresse e-mail valide"),
-    password: z
-      .string()
-      .min(8, "Le mot de passe doit contenir au moins 8 caractères")
-      .max(128, "Le mot de passe ne doit pas dépasser 128 caractères"),
-  });
 
   //handling the typing of schema
 
@@ -80,6 +90,7 @@ const onSubmit = (data, event) =>{
                   {...register("email")}
                   className="border border-gray-300 rounded-md py-2 px-3 w-full"
                 />
+                {errors.email && <span className="text-color4">{errors.email.message}</span>}
               </div>
               <div className="mb-4">
                 <label htmlFor="password" className="block font-medium mb-1">
@@ -90,7 +101,7 @@ const onSubmit = (data, event) =>{
                   {...register("password",{required : true})}
                   className="border border-gray-300 rounded-md py-2 px-3 w-full"
                 />
-                {errors.password && <span className="text-color4">This field is of course required</span>}
+                {errors.password && <span className="text-color4">{errors.password.message}</span>}
               </div>
               <button
                 type="submit"

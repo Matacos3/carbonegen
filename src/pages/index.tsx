@@ -52,6 +52,9 @@ export default function Home() {
 
   const onSubmit = (data: LoginSchemaType) => {
     console.log("data to be sent:", data);
+    //using SWR for connexion
+
+    //using classic fetch for  connection
     fetch("/api/users/login", {
       method: "POST",
       headers: { "content-type": "application/json" },

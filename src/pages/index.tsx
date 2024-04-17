@@ -4,8 +4,7 @@ import * as z from "zod";
 import { useForm } from "react-hook-form";
 import zod from "zod";
 import { zodResolver } from "@hookform/resolvers/zod"; // Ajoutez cette ligne
-import { useDispatch } from "react-redux";
-import { login } from "../redux/user";
+
 import { useRouter } from "next/router";
 
 //declaring zod schema
@@ -24,7 +23,6 @@ export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [authError, setAuthError] = useState(false);
 
-  const dispatch = useDispatch();
   const router = useRouter();
 
   const handleOpenModal = () => {
@@ -65,14 +63,14 @@ export default function Home() {
         console.log("data received:", data);
         if (data.result === true) {
           setAuthError(false);
-          const token = data.data.token ? data.data.token : "thisIsAToken";
+          const token = data.token ? data.token : "thisIsAToken";
           const loginInfos = {
             mail: data.data.email,
             name: data.data.name,
             token: token,
           };
-          console.log(loginInfos);
-          dispatch(login(loginInfos));
+          console.log("ce sont les informations récupérées lors de la connexion", loginInfos);
+          localStorage.setItem("token",token)
           router.push("/secured");
         } else {
           setAuthError(true);

@@ -1,4 +1,3 @@
-import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -7,7 +6,6 @@ import { useForm } from "react-hook-form";
 
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import user from "@/redux/user";
 
 const changeSchema = z.object({
   email: z.string().email("Veuillez saisir une adresse e-mail valide"),
@@ -19,17 +17,11 @@ const changeSchema = z.object({
 export type ChangeSchemaType = z.infer<typeof changeSchema>;
 
 export default function UserSpace() {
-  //reading userInfos
-  const userInfos = useSelector((state) => state.user.value);
+
   //declaring router const
   const router = useRouter();
   //redirecting if not connected
 
-  useEffect(() => {
-    if (!userInfos.isConnected) {
-      router.push("/");
-    }
-  }, [userInfos.isConnected, router]);
 
   //handlIng modals apparitions
 
@@ -46,8 +38,8 @@ export default function UserSpace() {
     mode: "onBlur",
     resolver: zodResolver(changeSchema),
     defaultValues: {
-      name: userInfos.name,
-      email: userInfos.mail,
+      name: "Ceci est le nom qu’il faut changer",
+      email: "Ceci est le mail uq’il faut changer",
     },
   });
   console.log(watch("email"));
@@ -63,8 +55,8 @@ export default function UserSpace() {
       <div className="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-md flex items-center space-x-4">
         <div>
           <h1 className="text-xl font-medium text-black">Espace utilisateur</h1>
-          <p className="text-gray-600">{userInfos.mail} </p>
-          <p className="text-gray-600">{userInfos.name} </p>
+          <p className="text-gray-600">"ceci est le mail qu’il faut afficher" </p>
+          <p className="text-gray-600">"ceci est le nom qu’il faut afficher"</p>
           <button
             onClick={() => setShowChangeModal(true)}
             className="text-blue-600 underline"

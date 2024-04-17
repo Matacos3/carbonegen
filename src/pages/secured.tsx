@@ -1,23 +1,27 @@
-import { useEffect } from 'react';
-import { useRouter } from 'next/router';
-import { useSelector, useDispatch } from 'react-redux';
-import { logout } from "../redux/user"
-import Link from "next/link"
+import { useEffect } from "react";
+import { useRouter } from "next/router";
+import Link from "next/link";
+import useUser from "../data/use-user";
 
 export default function securedPage() {
+  //handling useUser
+  const id = "1";
+  const token = localStorage.getItem("token");
+  console.log("ceci est le token :", token)
+
+  const { user, loading, loggedOut, mutate } = useUser(id, token);
+  console.log(user)
+  console.log("informations sur user via SWR:", user)
+
+  //----------------------------------------------
   const router = useRouter();
-  const dispatch = useDispatch();
-  const userInfos = useSelector((state) => state.user.value);
 
-  useEffect(() => {
-    if (!userInfos.isConnected) {
-      router.push('/');
-    }
-  }, [userInfos.isConnected, router]);
 
-  const handleDeconnection = () => {
-    dispatch(logout());
-  };
+  const handleDeconnection = () =>{
+    console.log("handle deconnection")
+  }
+
+  
   return (
     <>
       {/* this must appear as a navbar in the page */}
@@ -26,14 +30,23 @@ export default function securedPage() {
           <img src="c4logo.png"></img>
           <div className="text-lg font-semibold">Welcome to my app</div>
 
-          {userInfos.isConnected &&
+    
             <Link href="user/me">
-              <div className="text-white hover:text-color2">Connected as: {userInfos.mail}</div>
+              <div className="text-white hover:text-color2">
+          
+                Connected as : {user && user.userData.payload.email}
+              </div>
             </Link>
-          }
+          
 
-          {userInfos.isConnected && <button className="bg-color4 text-white font-semibold py-2 px-4 rounded-md shadow-md hover:bg-color2 transition duration-200" onClick={() => handleDeconnection()}>Se déconnecter</button>}
-
+  
+            <button
+              className="bg-color4 text-white font-semibold py-2 px-4 rounded-md shadow-md hover:bg-color2 transition duration-200"
+              onClick={() => handleDeconnection()}
+            >
+              Se déconnecter
+            </button>
+    
         </div>
       </nav>
       <div className="bg-color1 text-primary min-h-screen flex flex-col items-center justify-center p-8">

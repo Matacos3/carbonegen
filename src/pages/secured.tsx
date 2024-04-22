@@ -3,52 +3,27 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import useUser from "../data/use-user";
 
+import Navbar from "../components/Navbar"
 export default function securedPage() {
   //handling useUser
-  const id = "1";
-  const token = localStorage.getItem("token");
-  console.log("ceci est le token :", token)
 
-  const { user, loading, loggedOut, mutate } = useUser(id, token);
-  console.log(user)
-  console.log("informations sur user via SWR:", user)
+  // const token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEsImVtYWlsIjoiYWNvc3RhLmdhcmNpYS5tYXRlb0BnbWFpbC5jb20iLCJuYW1lIjoiTWF0ZW8gQWNvc3RhIiwiaWF0IjoxNzEzNDI2MDI1LCJleHAiOjE3MTQwMzA4MjV9.F02o1YX0lzptcG99N2rhOrO_N9IkROvta6B-rfCyOBE"
+
+  const { user, loading, loggedOut, mutate } = useUser("1");
+ 
 
   //----------------------------------------------
   const router = useRouter();
 
 
-  const handleDeconnection = () =>{
-    console.log("handle deconnection")
-  }
-
   
   return (
     <>
-      {/* this must appear as a navbar in the page */}
-      <nav className="fixed top-0 left-0 w-full px-6 py-4 bg-color2 shadow-md z-10">
-        <div className="flex items-center justify-between">
-          <img src="c4logo.png"></img>
-          <div className="text-lg font-semibold">Welcome to my app</div>
+     
+ {/* test for another navbar */}
 
-    
-            <Link href="user/me">
-              <div className="text-white hover:text-color2">
-          
-                Connected as : {user && user.userData.payload.email}
-              </div>
-            </Link>
-          
 
-  
-            <button
-              className="bg-color4 text-white font-semibold py-2 px-4 rounded-md shadow-md hover:bg-color2 transition duration-200"
-              onClick={() => handleDeconnection()}
-            >
-              Se déconnecter
-            </button>
-    
-        </div>
-      </nav>
+      <Navbar />
       <div className="bg-color1 text-primary min-h-screen flex flex-col items-center justify-center p-8">
         <h1 className="text-center text-2xl mb-8">
           This is a secured page for connected users only
@@ -59,7 +34,7 @@ export default function securedPage() {
               Voir des FE
             </button>
           </Link>
-          <Link href="/">
+          <Link href="/fe/feOnDb">
             <button className="bg-color4 text-white font-semibold py-2 px-4 rounded-md shadow-md hover:bg-color2 transition duration-200 w-full">
               FE sur les bases de données
             </button>

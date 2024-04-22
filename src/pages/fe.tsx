@@ -3,6 +3,7 @@ import { useEffect, useState } from "react"
 import useSWR from "swr"
 import Fe from "../components/Fe"
 import { feResponses } from "./api/fetch_data"
+import Navbar from "@/components/Navbar"
 
 export default function fe() {
 
@@ -41,6 +42,7 @@ export default function fe() {
 
   return (
     <div>
+      <Navbar />
       <div >
         <h1 className="text-center">Base Facteurs d’Émission</h1>
       </div>

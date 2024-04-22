@@ -1,4 +1,4 @@
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useState, useEffect } from "react";
 import Link from "next/link";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
@@ -6,6 +6,7 @@ import zod from "zod";
 import { zodResolver } from "@hookform/resolvers/zod"; // Ajoutez cette ligne
 
 import { useRouter } from "next/router";
+import useUser from "../data/use-user";
 
 //declaring zod schema
 const loginSchema = z.object({
@@ -23,7 +24,21 @@ export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [authError, setAuthError] = useState(false);
 
+//getting useuster states
+
+const { user, loading, loggedOut, mutate } = useUser("1");
+
   const router = useRouter();
+  useEffect(() => {
+    // If user is not logged in, redirect to "/"
+    if (user) {
+      console.log("the use effect is triggered because your are logged in")
+      router.push("/secured");
+    }
+  }, [user]);
+
+  // Check if the user is already authenticated
+  
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -71,7 +86,6 @@ export default function Home() {
           };
           console.log("ce sont les informations récupérées lors de la connexion", loginInfos);
           localStorage.setItem("token",token)
-          router.push("/secured");
         } else {
           setAuthError(true);
         }

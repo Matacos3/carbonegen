@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import useUser from "../../data/use-user";
 
 //importing zod
 
@@ -17,12 +18,22 @@ const changeSchema = z.object({
 export type ChangeSchemaType = z.infer<typeof changeSchema>;
 
 export default function UserSpace() {
-
   //declaring router const
   const router = useRouter();
+  //importing states from useUser
+  const { user, loading, loggedOut, mutate } = useUser("1");
+
   //redirecting if not connected
 
+  useEffect(() => {
+    // If user is not logged in, redirect to "/"
+    if (loggedOut) {
+      console.log("the use effect is triggered because your are logged out");
+      router.push("/");
+    }
 
+    console.log("voici les changements de user", user);
+  }, [user, loggedOut]);
   //handlIng modals apparitions
 
   const [showChangeModal, setShowChangeModal] = useState(false);
@@ -37,17 +48,26 @@ export default function UserSpace() {
   } = useForm<ChangeSchemaType>({
     mode: "onBlur",
     resolver: zodResolver(changeSchema),
-    defaultValues: {
-      name: "Ceci est le nom qu’il faut changer",
-      email: "Ceci est le mail uq’il faut changer",
-    },
   });
+
   console.log(watch("email"));
   console.log(watch("name"));
   //handling submissions variables
 
   const onSubmit = (data: ChangeSchemaType) => {
-    console.log("data to be sent:",  data);
+    setShowChangeModal(false)
+    console.log("data to be sent:", data);
+    fetch("http://localhost:3000/api/users/edit",{
+      method:"POST",
+      body: JSON.stringify(data),
+      headers:{"Content-Type":"application/json"}
+    })
+    .then(response => response.json())
+    .then(data=>{
+      console.log(data);
+      localStorage.setItem("token",data.token)
+      mutate()
+    })
   };
 
   return (
@@ -55,8 +75,13 @@ export default function UserSpace() {
       <div className="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-md flex items-center space-x-4">
         <div>
           <h1 className="text-xl font-medium text-black">Espace utilisateur</h1>
-          <p className="text-gray-600">"ceci est le mail qu’il faut afficher" </p>
-          <p className="text-gray-600">"ceci est le nom qu’il faut afficher"</p>
+          <p className="text-gray-600">
+            Votre adresse mail : {user ? user.userData.payload.email : "error"}
+          </p>
+          <p className="text-gray-600">
+            {" "}
+            Votre nom : {user ? user.userData.payload.name : "error"}
+          </p>
           <button
             onClick={() => setShowChangeModal(true)}
             className="text-blue-600 underline"
@@ -68,7 +93,10 @@ export default function UserSpace() {
       {/* Mail modal */}
       {showChangeModal && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg">
+          <div className=" relative bg-white p-6 rounded-lg shadow-lg">
+            <div className="cursor-pointer absolute left-1 top-1" onClick={()=>setShowChangeModal(false)}>
+              x
+            </div>
             <form onSubmit={handleSubmit(onSubmit)}>
               <label htmlFor="mail" className="block font-medium text-gray-700">
                 New mail

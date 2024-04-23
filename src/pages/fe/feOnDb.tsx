@@ -1,20 +1,75 @@
 import Navbar from "../../components/Navbar";
+
 import { useState } from "react";
+//importing zod for validation form
+import * as z from "zod";
+//import useForm from react
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+//declaring zod schema
+
+const newFeSchema = z
+  .object({
+    name: z.string().min(1, "Merci d’entrer votre nom"),
+    value: z.coerce
+      .number({ invalid_type_error: "merci de rentrer un nombre" })
+      .positive("merci de rentrer un nombre positif"),
+    unit: z.enum(["kg", "m2", "kWh", "km"]),
+  })
+  .required();
+
+//export schema
+export type newFeSchemaType = z.infer<typeof newFeSchema>;
+
 export default function feOnDbPage() {
   //setting states
   //showing modal or not
   const [showModal, setShowModal] = useState(false);
+//id value from navbar
 
+const [id, setId] = useState("")
   //handling adding a FE in DB
 
-  const addFe = () => {
+  const addFe = (data: newFeSchemaType) => {
     console.log("we are adding FE");
+    console.log("données passées par le formulaire",data);
+    console.log("et voici l’id de user:", id)
+    fetch("/api/fe/addFe",
+      {
+        method : "POST",
+        headers : {"Content-Type":"application/json"},
+        body : JSON.stringify({...data, author : id} )
+      }
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("résultat de la requête: ",data);
+        if (data) {
+          setShowModal(false);
+        }
+      });
   };
 
+  //using useForm
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<newFeSchemaType>({
+    mode: "onBlur",
+    resolver: zodResolver(newFeSchema),
+  });
+
+  //watching all values
+  console.log(watch("name"));
+  console.log(watch("value"));
   //coding modal
 
   const modal = (
-    <div className="absolute top-1/2 left-1/2 bg-color1 h-52 w-96 -translate-x-1/2 -translate-y-1/2 rounded text-color2 flex flex-col justify-center items-center">
+    <div className="absolute top-1/2 left-1/2 bg-color1 h-64 w-96 -translate-x-1/2 -translate-y-1/2 rounded text-color2 flex flex-col justify-center items-center">
       <div
         onClick={() => setShowModal(false)}
         className=" p-2 cursor-pointer text-color2 absolute top-0 right-0 hover:text-color3"
@@ -22,13 +77,60 @@ export default function feOnDbPage() {
         Close
       </div>
       <h3 className="text-color2">Ajoutez un fe ici</h3>
-      <form></form>
+      <form
+        onSubmit={handleSubmit(addFe)}
+        className="text-color2 flex flex-col items-center justify-center w-full"
+      >
+        <label className="text-white" htmlFor="name">
+          Nom du produit
+        </label>
+        <input
+          {...register("name")}
+          className="border-black m-0.5 w-1/2 text-color1"
+        ></input>
+        <span className="text-color4 h-4">
+          {errors.name && errors.name.message}
+        </span>
+        <label className="text-white" htmlFor="value">
+          Quantité émise (en Kg)
+        </label>
+        <input
+          type="number"
+          {...register("value")}
+          className="border-black m-0.5 w-1/2 text-color1"
+        ></input>
+        <span className="text-color4 h-4">
+          {errors.value && errors.value.message}
+        </span>
+
+        {/* reference unit */}
+        <label className="text-white" htmlFor="unit">
+          Unité de référence
+        </label>
+        <select
+          {...register("unit")}
+          className="border-black m-0.5 w-1/2 text-color1"
+        >
+          <option value="">Choisir une unité de référence</option>
+          <option value="kg">kg</option>
+          <option value="m2">m2</option>
+          <option value="kWh">kWh</option>
+          <option value="km">km</option>
+        </select>
+
+        <button
+          type="submit"
+          className="bg-color1 text-color3 p-2 rounded transition-all hover:bg-color2"
+        >
+          Ajouter le FE
+        </button>
+      </form>
     </div>
   );
 
   return (
     <div className="h-screen relative ">
-      <Navbar />
+      <Navbar setId={(id)=>setId(id)}/>
       {showModal && modal}
       <div className="flex items-center justify-center flex-col">
         <h1>Base de données facteurs d’émissions</h1>

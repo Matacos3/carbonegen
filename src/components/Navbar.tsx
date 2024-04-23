@@ -14,7 +14,13 @@ export default function Navbar(props) {
       console.log("the use effect is triggered because your are logged out");
       router.push("/");
     }
-  }, [loggedOut]);
+
+    if(user){
+      console.log("au niveau de Navbar:", user)
+      props.setId(user.userData.payload.sub)
+
+    }
+  }, [user, loggedOut]);
 
   const handleDeconnection = async () => {
     console.log("handle deconnection");

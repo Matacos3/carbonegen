@@ -14,7 +14,7 @@ import useSWR from "swr";
 
 //declaring zod schema
 
-const newFeSchema = z
+export const newFeSchema = z
   .object({
     name: z.string().min(1, "Merci d’entrer le nom du produit "),
     value: z.coerce

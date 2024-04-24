@@ -1,4 +1,6 @@
+//importing all components
 import Navbar from "../../components/Navbar";
+import BddFe from "@/components/BddFe";
 
 import { useState } from "react";
 //importing zod for validation form
@@ -7,20 +9,27 @@ import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+//importing SWR
+import useSWR from "swr";
+
 //declaring zod schema
 
 const newFeSchema = z
   .object({
-    name: z.string().min(1, "Merci d’entrer votre nom"),
+    name: z.string().min(1, "Merci d’entrer le nom du produit "),
     value: z.coerce
-      .number({ invalid_type_error: "merci de rentrer un nombre" })
-      .positive("merci de rentrer un nombre positif"),
+      .number({ invalid_type_error: "Merci de rentrer un nombre" })
+      .positive("Merci de rentrer un nombre positif"),
     unit: z.enum(["kg", "m2", "kWh", "km"]),
   })
   .required();
 
 //export schema
 export type newFeSchemaType = z.infer<typeof newFeSchema>;
+
+//fetcher function 
+
+const fetcher = (...args) => fetch(...args).then(res => res.json())
 
 export default function feOnDbPage() {
   //setting states
@@ -66,6 +75,11 @@ const [id, setId] = useState("")
   //watching all values
   console.log(watch("name"));
   console.log(watch("value"));
+
+  //using SWR to get the data
+
+const { data, error, isLoading} = useSWR("/api/fe/getAllFeBdd", fetcher)
+console.log(data)
   //coding modal
 
   const modal = (
@@ -116,6 +130,7 @@ const [id, setId] = useState("")
           <option value="m2">m2</option>
           <option value="kWh">kWh</option>
           <option value="km">km</option>
+          <option value="l">l</option>
         </select>
 
         <button
@@ -140,7 +155,14 @@ const [id, setId] = useState("")
         >
           Ajoutez un FE dans la base de données
         </button>
-        <div className="bg-color1 w-4/5"></div>
+        <div className="bg-color1 w-4/5">
+          {data &&
+          data.data.map(infos=>{
+            return(
+              <BddFe {...infos}/>
+            )
+          })}
+        </div>
       </div>
     </div>
   );

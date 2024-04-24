@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import useUser from "../data/use-user";
@@ -15,6 +15,7 @@ export default function securedPage() {
   //----------------------------------------------
   const router = useRouter();
 
+  const [id, setId] = useState("")
 
   
   return (
@@ -23,7 +24,7 @@ export default function securedPage() {
  {/* test for another navbar */}
 
 
-      <Navbar />
+      <Navbar setId={(id)=>setId(id)}/>
       <div className="bg-color1 text-primary min-h-screen flex flex-col items-center justify-center p-8">
         <h1 className="text-center text-2xl mb-8">
           This is a secured page for connected users only

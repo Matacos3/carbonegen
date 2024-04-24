@@ -56,6 +56,7 @@ const [id, setId] = useState("")
         console.log("résultat de la requête: ",data);
         if (data) {
           setShowModal(false);
+          mutate()
         }
       });
   };
@@ -78,12 +79,12 @@ const [id, setId] = useState("")
 
   //using SWR to get the data
 
-const { data, error, isLoading} = useSWR("/api/fe/getAllFeBdd", fetcher)
+const { data, error, isLoading, mutate} = useSWR("/api/fe/getAllFeBdd", fetcher)
 console.log(data)
   //coding modal
 
   const modal = (
-    <div className="absolute top-1/2 left-1/2 bg-color1 h-64 w-96 -translate-x-1/2 -translate-y-1/2 rounded text-color2 flex flex-col justify-center items-center">
+    <div className="absolute top-1/2 left-1/2 bg-color3 h-64 w-96 -translate-x-1/2 -translate-y-1/2 rounded text-color2 flex flex-col justify-center items-center">
       <div
         onClick={() => setShowModal(false)}
         className=" p-2 cursor-pointer text-color2 absolute top-0 right-0 hover:text-color3"
@@ -155,7 +156,7 @@ console.log(data)
         >
           Ajoutez un FE dans la base de données
         </button>
-        <div className="bg-color1 w-4/5">
+        <div className=" w-4/5">
           {data &&
           data.data.map(infos=>{
             return(

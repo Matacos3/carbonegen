@@ -20,7 +20,7 @@ export const newFeSchema = z
     value: z.coerce
       .number({ invalid_type_error: "Merci de rentrer un nombre" })
       .positive("Merci de rentrer un nombre positif"),
-    unit: z.enum(["kg", "m2", "kWh", "km"]),
+    unit: z.enum(["kg", "m2", "kWh", "km","l"]),
   })
   .required();
 
@@ -160,7 +160,7 @@ console.log(data)
           {data &&
           data.data.map(infos=>{
             return(
-              <BddFe {...infos}/>
+              <BddFe {...infos} mutate={()=>mutate()}/>
             )
           })}
         </div>
